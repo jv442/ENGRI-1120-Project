@@ -10,6 +10,8 @@ Introduction
 Materials
 * For our materials, we used D-Xylose, Potassium Nitrate, NADH, and Beta-D-Glucose 6-Phosphate. We also ended up needing 11 different chips and 110 separators. We also needed 11 pumps to pump in the material since we chose to run our reactors in parallel.
 
+
+Method
 * We maximized the output of PDGN using a parallel system. We also decided to separate out other profitable products by separating the outflow stream. When 100% of the stream was going into the separator, we still needed 11 reactors running simultaneously in order to produce a little over 1 g/hr of PDGN. Also, to get at least 95% purity, we needed at least 6 levels of separation. So, using this information, we found the minimum fraction of flow that needs to go into the first separator in order to still get at least 1 g/hr of PDGN after 6 levels of separation. That number turned out to be 92% of the outflow stream. Then after calculating that, we wrote another code to calculate the output of a different material from the 8% of the outflow stream remaining. The material that was produced that would’ve yielded us the most profit was NAD and it only required 4 levels of separation. On top of that, we also we calculated it so that we would use the minimum materials required to get the maximum output of PDGN possible. So all of our inputs get completely used up so they aren't present in the outflow stream that gets separated.
 
 The reaction process we calculated should look like this:
