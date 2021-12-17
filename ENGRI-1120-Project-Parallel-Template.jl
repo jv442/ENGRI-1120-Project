@@ -38,7 +38,7 @@ md"""
 
 # ╔═╡ 833d7250-f4ab-49a2-a43e-1b21def59ad4
 html"""
-<p style="font-size:20px;">Creative Name: Sebastian Soto, Joan Varous, Ashlyn Dumaw </br>
+<p style="font-size:20px;">Team name: Student name, Student name, Student name ... Student name</br>
 Smith School of Chemical and Biomolecular Engineering, Cornell University, Ithaca NY 14850</p>
 """
 
@@ -47,50 +47,9 @@ md"""
 ### Introduction
 """
 
-# ╔═╡ 8d20604d-360a-4524-bf38-1ac30e5d9be4
-md"""
-For our project we had to maximize the output of PDGN using the sugar Xylose. We want to see if this process would be an effective and profitable process.
-"""
-
 # ╔═╡ 884a0a7d-e5d8-4417-b109-d00c37a01766
 md"""
 ### Materials and Methods
-"""
-
-# ╔═╡ e9ec4f6d-aea4-4ff4-b25e-49f422a4051f
-md"""
-For our materials, we used D-Xylose, Potassium Nitrate, NADH, and Beta-D-Glucose 6-Phosphate. We also ended up needing 11 different chips and 110 separators. We also needed 11 pumps to pump in the material since we chose to run our reactors in parallel.
-
-We maximized the output of PDGN using a parallel system. We also decided to separate out other profitable products by separating the outflow stream. When 100% of the stream was going into the separator, we still needed 11 reactors running simultaneously in order to produce a little over 1 g/hr of PDGN. Also, to get at least 95% purity, we needed at least 6 levels of separation. So, using this information, we found the minimum fraction of flow that needs to go into the first separator in order to still get at least 1 g/hr of PDGN after 6 levels of separation. That number turned out to be 92% of the outflow stream. Then after calculating that, we wrote another code to calculate the output of a different material from the 8% of the outflow stream remaining. The material that was produced that would’ve yielded us the most profit was NAD and it only required 4 levels of separation. On top of that, we also we calculated it so that we would use the minimum materials required to get the maximum output of PDGN possible. So all of our inputs get completely used up so they aren't present in the outflow stream that gets separated.
-
-The reaction process we calculated should look like this:
-
-1)D-Xylose + NADPH + H+ ⇔ Xylitol + NADP+ 
-
-2)beta-D-Glucose 6-phosphate + NADP+ ⇔ D-Glucono-15-lactone 6-phosphate + NADPH + H+ 
-
-3)Xylitol + NAD+ ⇔ D-Xylulose + NADH + H+ 
-
-4)ATP + D-Xylulose ⇔ ADP + D-Xylulose 5-phosphate 
-
-5)D-Xylulose 5-phosphate ⇔ D-Ribulose 5-phosphate 
-
-6)D-Ribulose 5-phosphate ⇔ D-Ribose 5-phosphate 
-
-7)D-Ribose 5-phosphate + D-Xylulose 5-phosphate ⇔ Sedoheptulose 7-phosphate + D-Glyceraldehyde 3-phosphate 
-
-8)D-Glyceraldehyde 3-phosphate ⇔ Glycerone phosphate 
-
-9)Glycerone phosphate ⇔ Methylglyoxal + Orthophosphate 
-
-10)Methylglyoxal + NADPH + H+ ⇔ (S)-Lactaldehyde + NADP+ 
-
-11)Methylglyoxal + NADH + H+ ⇔ (S)-Lactaldehyde + NAD 
-
-12)(S)-Lactaldehyde + NADH + H+ ⇔ Propane-1,2-diol + NAD+ 
-
-13)Propane-1,2-diol + 2KNO3 ⇔ PGDN + 2KOH 
-
 """
 
 # ╔═╡ ad5d595e-4dba-49cd-a446-e1df737fd75d
@@ -98,18 +57,21 @@ md"""
 ##### Step 1: Configure the Flux Balance Analysis (FBA) calculation for a _single_ chip
 """
 
+# ╔═╡ c4a35830-1397-4788-aa91-be3d8c5e81c4
+
+
 # ╔═╡ 5bfdf6f9-2927-4a9a-a386-8840c676329b
 begin
 
 	# setup the FBA calculation for the project -
 
 	# === SELECT YOUR PRODUCT HERE ==================================================== #
-	# What rate are trying to maximize? (PDGN)
+	# What rate are trying to maximize? (select your product)
 	# rn:R08199 = isoprene
 	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
 	# rn:rn:R09799 = Hydrazine
 	# rn:R03119 = 3G
-	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:28235c0c-ec00-4a11-8acb-510b0f2e2687")
+	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R03119")
 	# ================================================================================= #
 
 	# First, let's build the stoichiometric matrix from the model object -
@@ -139,25 +101,23 @@ begin
 	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
 	# what you feed *depends upon your product*
 	compounds_that_we_need_to_supply_feed_1 = [
-		"d-xylose", 
+		"oxygen", "sucrose"
 	]
 
 	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
 	mol_flow_values_feed_1 = [
-		0.634 	; # d-xylose mmol/hr
-		 
+		10.0 	; # oxygen mmol/hr
+		0.822 	; # sucrose mmol/hr (maybe: 0.822 or 6.1?)
 	]
 
 	# what is coming into feed stream 2?
 	compounds_that_we_need_to_supply_feed_2 = [
-		"nadh", "potassium nitrate", "beta-d-glucose 6-phosphate"
+		"glycerol"
 	]
 
 	# let's always add Vₘ into feed stream 2
 	mol_flow_values_feed_2 = [
-		2.11408 		; # nadh mmol/hr
-		4.932 ; # potassium nitrate mmol/hr
-		1.05686 ; # beta-d-glucose 6-phosphate mmol/hr
+		Vₘ 		; # glycerol mmol/hr
 	]
 	
 	
@@ -332,22 +292,22 @@ end
 
 # ╔═╡ 80205dc2-0cd9-4543-be6c-2b3a7a5010d5
 # How many chips do we want to operate in parallel?
-number_of_chips = 11;
+number_of_chips = 10;
 
 # ╔═╡ eb091c37-29f6-45e8-8716-126c2df7f125
 # how many levels are we going to have in the separation tree?
-number_of_levels = 6;
+number_of_levels = 7;
 
 # ╔═╡ 65c26314-f7de-42c7-978c-5fe18ef45850
 # what compound are we trying to separate?
-idx_target_compound = find_compound_index(MODEL,:compound_name=>"PGDN");
+idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol");
 
 # ╔═╡ fe1a84e2-0a44-4341-9add-35f8bb296454
 begin
 
 	# alias the mass flow into the sep-units
 	# mass flow coming out of the mixer -
-	mass_flow_into_seps = (number_of_chips)*(.92)mass_dot_output
+	mass_flow_into_seps = (number_of_chips)*mass_dot_output
 	
 	# define the split -
 	θ = 0.75
@@ -448,136 +408,14 @@ with_terminal() do
 	pretty_table(state_table; header=state_table_header_row)
 end
 
-# ╔═╡ e4ae84ea-fa9e-4588-b986-fb779467ec88
-md"""
-### Seperating the output stream and using the MSU for a different species 
-"""
-
-# ╔═╡ f10812e0-1e33-44a6-88d9-bb252563e3bd
-# what compound are we trying to separate?
-idx_target_compound2 = find_compound_index(MODEL,:compound_name=>"nad");
-
-# ╔═╡ 872c5395-047c-4c14-b37a-a68933879656
-# how many levels are we going to have in the separation tree?
-number_of_levels2 = 6;
-
-# ╔═╡ bfb3f60d-f2bc-4f17-8407-f86291fd55b2
-begin
-
-	# alias the mass flow into the sep-units
-	# mass flow coming out of the mixer -
-	mass_flow_into_seps2 = (number_of_chips)*(.08)mass_dot_output
-	
-	# define the split -
-	θ2 = 0.75
-
-	# most of the "stuff" has a 1 - θ in the up, and a θ in the down
-	u2 = (1-θ)*ones(ℳ,1)
-	d2 = θ*ones(ℳ,1)
-
-	# correct defaults -
-	u2[idx_target_compound2] = θ2
-	d2[idx_target_compound2] = 1 - θ2
-
-	# let's compute the composition of the *always up* stream -
-	
-	# initialize some storage -
-	species_mass_flow_array_top2 = zeros(ℳ,number_of_levels2)
-	species_mass_flow_array_bottom2 = zeros(ℳ,number_of_levels2)
-
-	for species_index = 1:ℳ
-		value = mass_flow_into_seps[species_index]
-		species_mass_flow_array_top2[species_index,1] = value
-		species_mass_flow_array_bottom2[species_index,1] = value
-	end
-	
-	for level = 2:number_of_levels
-
-		# compute the mass flows coming out of the top -
-		m_dot_top2 = mass_flow_into_seps2.*(u2.^(level-1))
-		m_dot_bottom2 = mass_flow_into_seps2.*(d2.^(level-1))
-
-		# update my storage array -
-		for species_index = 1:ℳ
-			species_mass_flow_array_top2[species_index,level] = m_dot_top2[species_index]
-			species_mass_flow_array_bottom2[species_index,level] = m_dot_bottom2[species_index]
-		end
-	end
-	
-	# what is the mass fraction in the top stream -
-	species_mass_fraction_array_top2 = zeros(ℳ,number_of_levels2)
-	species_mass_fraction_array_bottom2 = zeros(ℳ,number_of_levels2)
-
-	# array to hold the *total* mass flow rate -
-	total_mdot_top_array2 = zeros(number_of_levels2)
-	total_mdot_bottom_array2 = zeros(number_of_levels2)
-	
-	# this is a dumb way to do this ... you're better than that JV come on ...
-	T_top2 = sum(species_mass_flow_array_top2,dims=1)
-	T_bottom2 = sum(species_mass_flow_array_bottom2,dims=1)
-	for level = 1:number_of_levels2
-
-		# get the total for this level -
-		T_level_top2 = T_top2[level]
-		T_level_bottom2 = T_bottom2[level]
-
-		# grab -
-		total_mdot_top_array2[level] = T_level_top2
-		total_mdot_bottom_array2[level] = T_level_bottom2
-
-		for species_index = 1:ℳ
-			species_mass_fraction_array_top2[species_index,level] = (1/T_level_top2)*
-				(species_mass_flow_array_top2[species_index,level])
-			species_mass_fraction_array_bottom2[species_index,level] = (1/T_level_bottom2)*
-				(species_mass_flow_array_bottom2[species_index,level])
-		end
-	end
-end
-
-# ╔═╡ cd239ea5-3947-48e7-95e4-3db2c90a612f
-begin
-
-	stages2 = (1:number_of_levels2) |> collect
-	plot(stages2,species_mass_fraction_array_top2[idx_target_compound2,:], linetype=:steppre,lw=2,legend=:bottomright, 
-		label="Mass fraction i = PDO Tops")
-	xlabel!("Stage index l",fontsize=18)
-	ylabel!("Tops mass fraction ωᵢ (dimensionless)",fontsize=18)
-
-	# make a 0.95 line target line -
-	target_line2 = 0.95*ones(number_of_levels2)
-	plot!(stages2, target_line2, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
-end
-
-# ╔═╡ a349cd6b-f6d9-4544-a735-d503db4e818b
-with_terminal() do
-
-	# initialize some space -
-	state_table = Array{Any,2}(undef, number_of_levels2, 3)
-	for level_index = 1:number_of_levels2
-		state_table[level_index,1] = level_index
-		state_table[level_index,2] = species_mass_fraction_array_top2[idx_target_compound2, level_index]
-		state_table[level_index,3] = total_mdot_top_array2[level_index]
-	end
-	
-	# header -
-	state_table_header_row = (["stage","ωᵢ i=⋆ top","mdot"],
-			["","","g/hr"]);
-
-	# write the table -
-	pretty_table(state_table; header=state_table_header_row)
-end
-
 # ╔═╡ fd339470-ffef-49fa-8636-dce7924e6405
 md"""
 ### Conclusions
-
-The conclusion that we have come to is that unfortunately, this process is not profitable. We tried using different sugars, yet none of them produced a fruitful outcome. No matter how many different methods we tried, we still couldn't produce something with a meaningful profit. We calculated PDGN to be a measley $1.66 per hour while it cost us $552.35 per hour just to run a single reactor. So the cost for running 11 reactors would be $6075.84 per hour while we would only make $18.26 from making PDGN. So we figured that we would make the bare minimum of PDGN while at the same time producing another material that would make us more money. We decided on NAD since we produced the most of that from the reaction. Unfortunately, trying to separate it out using only 8% of the outflow stream and getting it to 95% purity ended up with us making .53 grams of it per hour. That is equivalently worth $62.01. So by running the reactors to max efficieny to maximize profits while still producing enough PDGN to make the buyer happy, we'd end up making $700.37 for every $6075.84 we spent. That doesn't include the inital cost of the reactors, separation units, or pumps which would add more the cost and do nothing to increase the profits. 
 """
 
 # ╔═╡ 2f2713eb-a958-4d1a-a1cc-2723ea13c38c
 md"""
 ### References
-We got our costs and prices from https://www.sigmaaldrich.com/US/en
 """
 
 # ╔═╡ cef22b5d-be5d-49f2-987f-77cf1b9379b9
@@ -1653,33 +1491,26 @@ version = "0.9.1+5"
 # ╟─6f9851d0-9573-4965-8456-92d2c57afa91
 # ╟─833d7250-f4ab-49a2-a43e-1b21def59ad4
 # ╟─251363ad-1927-4b05-99f5-8c3f2508c0cb
-# ╟─8d20604d-360a-4524-bf38-1ac30e5d9be4
 # ╟─884a0a7d-e5d8-4417-b109-d00c37a01766
-# ╟─e9ec4f6d-aea4-4ff4-b25e-49f422a4051f
 # ╟─ad5d595e-4dba-49cd-a446-e1df737fd75d
+# ╟─c4a35830-1397-4788-aa91-be3d8c5e81c4
 # ╠═5bfdf6f9-2927-4a9a-a386-8840c676329b
 # ╟─e8a4faf8-2285-4544-830c-f39d3847e8cc
 # ╟─10424555-39cc-4ddf-8c22-db91cf102bfd
 # ╟─a3632011-833e-431b-b08f-f2896ad0a82a
-# ╟─39f3633e-b9df-4d01-946f-ba2d6c8ba6b7
+# ╠═39f3633e-b9df-4d01-946f-ba2d6c8ba6b7
 # ╟─4b3ef98c-d304-4ef4-95ef-f1d1ce562e36
 # ╟─7166a917-b676-465c-a441-4ff0530faf92
 # ╠═80205dc2-0cd9-4543-be6c-2b3a7a5010d5
 # ╠═eb091c37-29f6-45e8-8716-126c2df7f125
 # ╠═65c26314-f7de-42c7-978c-5fe18ef45850
-# ╠═fe1a84e2-0a44-4341-9add-35f8bb296454
-# ╟─efe968b6-4914-4c4c-a2fb-50d7e71f582b
-# ╟─4a308e7a-0149-4816-a24e-ecf23c0a759c
-# ╟─e4ae84ea-fa9e-4588-b986-fb779467ec88
-# ╠═f10812e0-1e33-44a6-88d9-bb252563e3bd
-# ╠═872c5395-047c-4c14-b37a-a68933879656
-# ╠═bfb3f60d-f2bc-4f17-8407-f86291fd55b2
-# ╟─cd239ea5-3947-48e7-95e4-3db2c90a612f
-# ╟─a349cd6b-f6d9-4544-a735-d503db4e818b
-# ╟─fd339470-ffef-49fa-8636-dce7924e6405
-# ╟─2f2713eb-a958-4d1a-a1cc-2723ea13c38c
-# ╟─5458cafc-430a-4e2e-a3f9-d23023e6053b
+# ╟─fe1a84e2-0a44-4341-9add-35f8bb296454
+# ╠═efe968b6-4914-4c4c-a2fb-50d7e71f582b
+# ╠═4a308e7a-0149-4816-a24e-ecf23c0a759c
+# ╠═fd339470-ffef-49fa-8636-dce7924e6405
+# ╠═2f2713eb-a958-4d1a-a1cc-2723ea13c38c
+# ╠═5458cafc-430a-4e2e-a3f9-d23023e6053b
 # ╟─cef22b5d-be5d-49f2-987f-77cf1b9379b9
-# ╟─213d4486-584f-11ec-2373-5d05e90dc5f8
+# ╠═213d4486-584f-11ec-2373-5d05e90dc5f8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
