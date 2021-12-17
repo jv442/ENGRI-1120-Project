@@ -1,6 +1,7 @@
 # ENGRI-1120-Project
 Creative Team: Sebastian Soto, Joan Varous, Ashlyn Dumaw
-Smith School of Chemical and Biomolecular Engineering, Cornell University, Ithaca NY 14850
+
+*Smith School of Chemical and Biomolecular Engineering, Cornell University, Ithaca NY 14850
 
 Video Description of Project: 
 
